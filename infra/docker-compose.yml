@@ -1,0 +1,159 @@
+# AIEA — Docker Compose. Single-user local. No auth.
+#
+# First-time bring-up:
+#   docker compose -f infra/docker-compose.yml up -d --build
+#   docker compose -f infra/docker-compose.yml exec api pixi run revision -m "initial"
+#   docker compose -f infra/docker-compose.yml exec api pixi run migrate
+
+name: aiea
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: infra/api.Dockerfile
+    container_name: aiea-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql+asyncpg://aiea:aiea@postgres:5432/aiea
+      - REDIS_URL=redis://redis:6379/0
+      - VAULT_PATH=/vault
+      - CREDS_PATH=/creds
+      - MODELS_PATH=/models
+      - LMSTUDIO_URL=${LMSTUDIO_URL:-http://host.docker.internal:1234}
+      - AIEA_ENV=${AIEA_ENV:-development}
+      - AIEA_HOST_HOME=${AIEA_HOST_HOME:-/Users/aminassadi}
+      - AIEA_ALLOWED_ROOTS=${AIEA_ALLOWED_ROOTS:-/Users/aminassadi/Downloads:/Users/aminassadi/aiea:/Users/aminassadi/Documents}
+    volumes:
+      - ../backend:/workspace
+      - pixi_api_env:/workspace/.pixi
+      - ../vault:/vault
+      - ../creds:/creds
+      - ../models:/models:ro
+      - ../docs:/aiea-docs:ro
+      - ${AIEA_HOST_HOME:-/Users/aminassadi}/Downloads:${AIEA_HOST_HOME:-/Users/aminassadi}/Downloads
+      - ${AIEA_HOST_HOME:-/Users/aminassadi}/aiea:${AIEA_HOST_HOME:-/Users/aminassadi}/aiea
+      - ${AIEA_HOST_HOME:-/Users/aminassadi}/Documents:${AIEA_HOST_HOME:-/Users/aminassadi}/Documents
+    ports:
+      - "4021:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: pixi run dev
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/worker.Dockerfile
+    container_name: aiea-worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql+asyncpg://aiea:aiea@postgres:5432/aiea
+      - REDIS_URL=redis://redis:6379/0
+      - VAULT_PATH=/vault
+      - CREDS_PATH=/creds
+      - MODELS_PATH=/models
+      - LMSTUDIO_URL=${LMSTUDIO_URL:-http://host.docker.internal:1234}
+      - AIEA_HOST_HOME=${AIEA_HOST_HOME:-/Users/aminassadi}
+      - AIEA_ALLOWED_ROOTS=${AIEA_ALLOWED_ROOTS:-/Users/aminassadi/Downloads:/Users/aminassadi/aiea:/Users/aminassadi/Documents}
+    volumes:
+      - ../backend:/workspace
+      - pixi_worker_env:/workspace/.pixi
+      - ../vault:/vault
+      - ../creds:/creds
+      - ../models:/models:ro
+      - ${AIEA_HOST_HOME:-/Users/aminassadi}/Downloads:${AIEA_HOST_HOME:-/Users/aminassadi}/Downloads
+      - ${AIEA_HOST_HOME:-/Users/aminassadi}/aiea:${AIEA_HOST_HOME:-/Users/aminassadi}/aiea
+      - ${AIEA_HOST_HOME:-/Users/aminassadi}/Documents:${AIEA_HOST_HOME:-/Users/aminassadi}/Documents
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: pixi run -e worker worker
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: infra/frontend.Dockerfile
+    container_name: aiea-frontend
+    depends_on:
+      - api
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4021
+      - API_URL_INTERNAL=http://api:8000
+      - NEXT_TELEMETRY_DISABLED=1
+      - WATCHPACK_POLLING=true
+      - PNPM_STORE_PATH=/tmp/.pnpm-store
+    volumes:
+      - ../frontend:/workspace
+      - frontend_node_modules:/workspace/node_modules
+      - frontend_next_cache:/workspace/.next
+    ports:
+      - "4020:3000"
+    command: pixi run dev
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: aiea-postgres
+    environment:
+      - POSTGRES_USER=aiea
+      - POSTGRES_PASSWORD=aiea
+      - POSTGRES_DB=aiea
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --locale=C
+    volumes:
+      - ../data/pg:/var/lib/postgresql/data
+    ports:
+      - "4025:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aiea -d aiea"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: aiea-redis
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - ../data/redis:/data
+    ports:
+      - "4026:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: aiea-caddy
+    depends_on:
+      - api
+      - frontend
+    volumes:
+      - ./caddy.Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "4022:80"
+    restart: unless-stopped
+
+volumes:
+  pixi_api_env:
+  pixi_worker_env:
+  frontend_node_modules:
+  frontend_next_cache:
+  caddy_data:
+  caddy_config:
