@@ -1,4 +1,4 @@
-# AIEA — AI Exam Assistant
+# AIEA, the AI Exam Assistant
 
 Write exam papers from your own course material, and catch the mistakes before students do.
 
@@ -250,20 +250,20 @@ silently on them, which is worse than failing loudly.
 
 ## Setting up your first course
 
-1. **Workspace** — create a course and give it four folders: `materials`, `brain`,
+1. **Workspace**: Create a course and give it four folders: `materials`, `brain`,
    `library`, `workshop`. AIEA can scaffold them for you.
 2. Put your files in `materials`, sorted into `lectures/`, `exercises/`, `exams/`,
    `book/`. This matters more than it looks: AIEA decides what your course *teaches*
    from where a file sits, so a solutions manual filed under `lectures/` will be treated
    as taught material.
-3. **Extraction** — scan and extract. Slides, PDFs and Word documents all work.
-4. **Course Map** — build the syllabus. This gives chapters and learning outcomes to
+3. **Extraction**: Scan and extract. Slides, PDFs and Word documents all work.
+4. **Course Map**: Build the syllabus. This gives chapters and learning outcomes to
    generate against.
-5. **Question Generation** — generate questions per chapter and category.
-6. **Question Bank** — produce answer keys and run Evaluate.
-7. **Exam Builder** — assemble a paper, or several variants at once.
-8. **Validation** — check it. Fix what it finds.
-9. **Exam Bank** — compile to PDF.
+5. **Question Generation**: Generate questions per chapter and category.
+6. **Question Bank**: Produce answer keys and run Evaluate.
+7. **Exam Builder**: Assemble a paper, or several variants at once.
+8. **Validation**: Check it. Fix what it finds.
+9. **Exam Bank**: Compile to PDF.
 
 ## How validation works
 
@@ -287,8 +287,8 @@ an override with no reason is indistinguishable from nobody having looked.
 
 Two files in your course's `brain/validation/` folder:
 
-- `deny-terms.md` — terms ruled out for this course. One per line. These block.
-- `allow-terms.md` — terms you have accepted. These are never reported again.
+- `deny-terms.md` holds terms ruled out for this course. One per line. These block.
+- `allow-terms.md` holds terms you have accepted. These are never reported again.
 
 This is deliberately per course. Counting alone cannot tell imported jargon from ordinary
 wording built out of words your course does use, so the tool warns and you make the call
