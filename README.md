@@ -51,7 +51,7 @@ If you already have Docker running and just want the short version:
 ```bash
 git clone https://github.com/am7as/aiea.git
 cd aiea
-cp .env.example .env      # then edit AIEA_HOST_HOME to your own home path
+cp .env.example infra/.env   # then edit AIEA_HOST_HOME to your own home path
 docker compose -f infra/docker-compose.yml up -d --build
 docker compose -f infra/docker-compose.yml exec api pixi run migrate
 ```
@@ -169,10 +169,13 @@ docker compose -f infra/docker-compose.yml exec api pixi run migrate
 ### 3. Configure
 
 ```bash
-cp .env.example .env
+cp .env.example infra/.env
 ```
 
-Open `.env` and set `AIEA_HOST_HOME` to your own home directory. This is the one value you
+The file has to sit next to the Compose file, in `infra/`. Docker Compose looks for it
+there, not in the repository root.
+
+Open `infra/.env` and set `AIEA_HOST_HOME` to your own home directory. This is the one value you
 must change; the containers mount folders from it so AIEA can read your course files.
 
 | Your system | Example value |
@@ -318,6 +321,9 @@ If you install [Pixi](https://pixi.sh) on the host you get shorter versions: `pi
 
 ## When something breaks
 
+**`required variable AIEA_HOST_HOME is missing a value`.** You skipped step 3, or put the
+file in the wrong place. It belongs at `infra/.env`, not the repository root.
+
 **Ports already in use.** AIEA uses 4020 to 4026. Find the culprit with `lsof -i :4022`
 (macOS, Linux) or `netstat -ano | findstr :4022` (Windows), or change the ports in
 `infra/docker-compose.yml`.
@@ -335,7 +341,7 @@ other stacks running. Raise the memory limit in Docker Desktop settings.
 **A page shows an error after `git pull`.** You probably have a pending migration:
 `docker compose -f infra/docker-compose.yml exec api pixi run migrate`.
 
-**Containers cannot see your files.** `AIEA_HOST_HOME` in `.env` does not match your real
+**Containers cannot see your files.** `AIEA_HOST_HOME` in `infra/.env` does not match your real
 home directory, or the folder is not listed in `AIEA_ALLOWED_ROOTS`. On Windows check you
 used `/c/Users/...` and not `C:\Users\...`.
 
@@ -371,5 +377,4 @@ Longer notes live in [`docs/`](docs/): [architecture](docs/architecture.md),
 
 ## Licence
 
-No licence has been chosen yet, so default copyright applies and reuse is not yet granted.
-If you want to use this, open an issue and ask.
+MIT. See [LICENSE](LICENSE). Use it, change it, teach with it.

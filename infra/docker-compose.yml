@@ -27,8 +27,8 @@ services:
       - MODELS_PATH=/models
       - LMSTUDIO_URL=${LMSTUDIO_URL:-http://host.docker.internal:1234}
       - AIEA_ENV=${AIEA_ENV:-development}
-      - AIEA_HOST_HOME=${AIEA_HOST_HOME:-/Users/aminassadi}
-      - AIEA_ALLOWED_ROOTS=${AIEA_ALLOWED_ROOTS:-/Users/aminassadi/Downloads:/Users/aminassadi/aiea:/Users/aminassadi/Documents}
+      - AIEA_HOST_HOME=${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}
+      - AIEA_ALLOWED_ROOTS=${AIEA_ALLOWED_ROOTS:?AIEA_ALLOWED_ROOTS is not set. Copy .env.example to .env (see the README).}
     volumes:
       - ../backend:/workspace
       - pixi_api_env:/workspace/.pixi
@@ -36,9 +36,9 @@ services:
       - ../creds:/creds
       - ../models:/models:ro
       - ../docs:/aiea-docs:ro
-      - ${AIEA_HOST_HOME:-/Users/aminassadi}/Downloads:${AIEA_HOST_HOME:-/Users/aminassadi}/Downloads
-      - ${AIEA_HOST_HOME:-/Users/aminassadi}/aiea:${AIEA_HOST_HOME:-/Users/aminassadi}/aiea
-      - ${AIEA_HOST_HOME:-/Users/aminassadi}/Documents:${AIEA_HOST_HOME:-/Users/aminassadi}/Documents
+      - ${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/Downloads:${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/Downloads
+      - ${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/aiea:${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/aiea
+      - ${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/Documents:${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/Documents
     ports:
       - "4021:8000"
     extra_hosts:
@@ -64,17 +64,17 @@ services:
       - CREDS_PATH=/creds
       - MODELS_PATH=/models
       - LMSTUDIO_URL=${LMSTUDIO_URL:-http://host.docker.internal:1234}
-      - AIEA_HOST_HOME=${AIEA_HOST_HOME:-/Users/aminassadi}
-      - AIEA_ALLOWED_ROOTS=${AIEA_ALLOWED_ROOTS:-/Users/aminassadi/Downloads:/Users/aminassadi/aiea:/Users/aminassadi/Documents}
+      - AIEA_HOST_HOME=${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}
+      - AIEA_ALLOWED_ROOTS=${AIEA_ALLOWED_ROOTS:?AIEA_ALLOWED_ROOTS is not set. Copy .env.example to .env (see the README).}
     volumes:
       - ../backend:/workspace
       - pixi_worker_env:/workspace/.pixi
       - ../vault:/vault
       - ../creds:/creds
       - ../models:/models:ro
-      - ${AIEA_HOST_HOME:-/Users/aminassadi}/Downloads:${AIEA_HOST_HOME:-/Users/aminassadi}/Downloads
-      - ${AIEA_HOST_HOME:-/Users/aminassadi}/aiea:${AIEA_HOST_HOME:-/Users/aminassadi}/aiea
-      - ${AIEA_HOST_HOME:-/Users/aminassadi}/Documents:${AIEA_HOST_HOME:-/Users/aminassadi}/Documents
+      - ${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/Downloads:${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/Downloads
+      - ${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/aiea:${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/aiea
+      - ${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/Documents:${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}/Documents
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: pixi run -e worker worker
