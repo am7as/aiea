@@ -313,3 +313,37 @@ def test_denied_term_is_reported_once_per_source_not_per_phrase():
     view = _view(prompt_md="superposition and superposition again, superposition.")
     findings = run_question_rules(view, _ctx(_corpus(taught="x"), deny={"superposition"}))
     assert len([f for f in findings if f.rule_id == "terminology.denied"]) == 1
+
+
+# ── bilingual halves stored in their own column ───────────────────────────────
+# bb70eaa7 Q5 shipped as `validation_status=clean` while its Swedish stem printed
+# `[Totalt: 3 poäng]` under an English `[Total: 5 marks]` header. Both mark rules split
+# `prompt_md` for the Swedish half, but this bank keeps the translation in
+# `translation_sv`, so the Swedish half was always empty and never checked.
+
+
+def test_marks_checks_a_translation_stored_in_its_own_column():
+    view = _view(
+        prompt_md="**EN**: Derive X. [Total: 5 marks]",
+        translation_sv="Härled X. [Totalt: 3 poäng]",
+        points=5,
+    )
+    findings = run_question_rules(view, _ctx())
+    assert any(
+        f.rule_id == "structure.marks" and "SE" in f.title for f in _blocking(findings)
+    )
+
+
+def test_matching_translation_totals_do_not_fire():
+    view = _view(
+        prompt_md="**EN**: Derive X. [Total: 5 marks]",
+        translation_sv="Härled X. [Totalt: 5 poäng]",
+        points=5,
+    )
+    assert not [f for f in _blocking(run_question_rules(view, _ctx()))]
+
+
+def test_monolingual_question_is_not_treated_as_bilingual():
+    view = _view(prompt_md="Derive X. [Total: 5 marks]", points=5)
+    findings = run_question_rules(view, _ctx())
+    assert "bilingual.asymmetry" not in _ids(findings)

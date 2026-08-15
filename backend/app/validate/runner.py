@@ -10,9 +10,10 @@ from __future__ import annotations
 import logging
 import uuid
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models.exam import Exam
+from app.db.models.exam import Exam, ExamQuestion
 from app.validate.lint import lint_exam
 from app.validate.reviewers import audit_scope, blind_solve, examiner_review
 from app.validate.rules import Finding
@@ -82,7 +83,18 @@ async def validate_exam(
                     )
                 )
 
-        for eq in exam.questions:
+        rows = list(
+            (
+                await db.execute(
+                    select(ExamQuestion)
+                    .where(ExamQuestion.exam_id == exam_id)
+                    .order_by(ExamQuestion.position)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        for eq in rows:
             try:
                 outcome = await blind_solve(db, eq.question_id)
                 findings.extend(outcome.findings)

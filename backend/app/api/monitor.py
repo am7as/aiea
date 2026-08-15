@@ -1,10 +1,9 @@
 """Monitor — AI usage, token counts, recent activity.
 
-Aggregates the `ai_messages` table by provider / model. Worker-side AI calls
-(generate_questions, classify, …) currently write conversation logs to disk
-under <vault>/aiea-memory/, not to the DB — those don't carry token counts.
-The chat / orchestrator paths DO write AIMessage rows with token + cost data.
-This endpoint exposes both.
+Aggregates the `ai_messages` table by provider / model. Every call that goes through
+`app.ai.router.resolve` records its tokens there, worker-side jobs included — see
+`app.ai.usage`. The conversation *text* still lives on disk under <vault>/aiea-memory/;
+only counts are kept here.
 """
 from __future__ import annotations
 

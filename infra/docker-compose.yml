@@ -29,6 +29,8 @@ services:
       - AIEA_ENV=${AIEA_ENV:-development}
       - AIEA_HOST_HOME=${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}
       - AIEA_ALLOWED_ROOTS=${AIEA_ALLOWED_ROOTS:?AIEA_ALLOWED_ROOTS is not set. Copy .env.example to .env (see the README).}
+      - AIEA_DEMO_RESET=${AIEA_DEMO_RESET:-0}
+      - AIEA_DEMO_SECRET=${AIEA_DEMO_SECRET:-}
     volumes:
       - ../backend:/workspace
       - pixi_api_env:/workspace/.pixi
@@ -66,6 +68,8 @@ services:
       - LMSTUDIO_URL=${LMSTUDIO_URL:-http://host.docker.internal:1234}
       - AIEA_HOST_HOME=${AIEA_HOST_HOME:?AIEA_HOST_HOME is not set. Copy .env.example to .env and set it to your home directory (see the README).}
       - AIEA_ALLOWED_ROOTS=${AIEA_ALLOWED_ROOTS:?AIEA_ALLOWED_ROOTS is not set. Copy .env.example to .env (see the README).}
+      - AIEA_DEMO_RESET=${AIEA_DEMO_RESET:-0}
+      - AIEA_DEMO_SECRET=${AIEA_DEMO_SECRET:-}
     volumes:
       - ../backend:/workspace
       - pixi_worker_env:/workspace/.pixi

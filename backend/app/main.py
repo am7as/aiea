@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import (
     ai,
     courses,
+    demo,
     docs,
     exams,
     fs,
@@ -62,6 +63,7 @@ def create_app() -> FastAPI:
     app.include_router(tasks.router, prefix=prefix)
     app.include_router(monitor.router, prefix=prefix)
     app.include_router(inventory.router, prefix=prefix)
+    app.include_router(demo.router, prefix=prefix)
     return app
 
 

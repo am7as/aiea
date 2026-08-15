@@ -168,6 +168,19 @@ def _split_languages(prompt: str) -> tuple[str, str]:
     return prompt[: marker.start()], prompt[marker.start() :]
 
 
+def _halves(q: QuestionView) -> tuple[str, str]:
+    """(swedish, english) for a question however its Swedish is stored.
+
+    Most of the bank keeps the translation in its own column rather than inline in
+    the prompt, so splitting `prompt_md` alone leaves the Swedish half empty and every
+    bilingual check silently passes.
+    """
+    sv, en = _split_languages(q.prompt_md)
+    if not sv.strip():
+        sv = q.translation_sv or ""
+    return sv, en
+
+
 # ── rules ─────────────────────────────────────────────────────────────────────
 
 
@@ -358,7 +371,7 @@ def rule_marks(q: QuestionView, ctx: "RuleContext") -> list[Finding]:
     """Sub-marks must sum to the question's points, and any in-text total must agree,
     in both languages. Caught OCT-Q1's `(Total: 8 marks)` under a `[5 p]` header."""
     out: list[Finding] = []
-    sv_half, en_half = _split_languages(q.prompt_md)
+    sv_half, en_half = _halves(q)
     halves = [("EN", en_half)] + ([("SE", sv_half)] if sv_half.strip() else [])
 
     for lang, half in halves:
@@ -394,7 +407,7 @@ def rule_marks(q: QuestionView, ctx: "RuleContext") -> list[Finding]:
 def rule_bilingual_symmetry(q: QuestionView, ctx: "RuleContext") -> list[Finding]:
     """The two languages must ask the same thing. Caught OCT-Q4, whose EN stem carried
     `[Total: 6 marks]` while the SE stem had no total at all."""
-    sv_half, en_half = _split_languages(q.prompt_md)
+    sv_half, en_half = _halves(q)
     if not sv_half.strip():
         return []
     out: list[Finding] = []

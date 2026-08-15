@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.ai.events import GenParams
 from app.ai.factory import build_provider
 from app.ai.providers.base import AbstractProvider
+from app.ai.usage import record_completion
 from app.db.models import Provider, TaskRoute, TaskRouteModel
 
 
@@ -83,6 +84,23 @@ async def _load_route(db: AsyncSession, task: str) -> TaskRoute | None:
     return res.scalar_one_or_none()
 
 
+def _attach_usage_recording(provider: AbstractProvider, task: str, name: str, model: str) -> None:
+    """Record tokens for every call this provider makes.
+
+    Patches the instance's bound `complete`, rather than returning a wrapper object, so
+    `isinstance(provider, AgentProvider)` and `provider.supports_vision` keep working —
+    both are load-bearing (the vision guard in `validate.reviewers` relies on them).
+    """
+    inner = provider.complete
+
+    async def complete(*args, **kwargs):
+        result = await inner(*args, **kwargs)
+        await record_completion(task, name, getattr(result, "model", None) or model, result)
+        return result
+
+    provider.complete = complete  # type: ignore[method-assign]
+
+
 async def resolve(db: AsyncSession, task: str) -> Resolution | None:
     """Resolve a task to a live provider + model, falling back to the default route."""
     route = await _load_route(db, task)
@@ -96,6 +114,7 @@ async def resolve(db: AsyncSession, task: str) -> Resolution | None:
     if provider_row is None:
         return None
     provider = build_provider(provider_row.name, provider_row.type, provider_row.config or {})
+    _attach_usage_recording(provider, task, provider_row.name, primary.model)
     return Resolution(
         provider=provider,
         provider_row=provider_row,
