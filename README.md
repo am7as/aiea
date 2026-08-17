@@ -22,19 +22,20 @@ computer except the prompts you send to whichever AI provider you configure.
 
 ## Watch it work
 
-Ten short screen recordings, about eleven minutes in total, scripted against a live
+Eighteen screen recordings, about twenty-three minutes in total, scripted against a live
 instance — everything on screen is the real application. They play right here in GitHub;
 click a title and it opens in the browser.
 
 **[Watch the walkthrough series →](docs/videos.md)**
 
-If you only watch three:
+If you only watch four:
 
 | | Clip | |
 |---|---|---|
-| ▶ | [Connect a local model](docs/videos/03-connect-a-local-model-ollama.mp4) — get AIEA talking to a model, free and local | 1:11 |
-| ▶ | [Allocate tasks to models](docs/videos/07-allocate-tasks-to-models.mp4) — route each job to the right provider | 1:40 |
-| ▶ | [Build an exam](docs/videos/09-build-an-exam-automatically.mp4) — blueprint to finished paper | 0:53 |
+| ▶ | [The Extraction panel](docs/videos/05-the-extraction-panel.mp4) — read your files properly, once | 2:19 |
+| ▶ | [Connect a local model](docs/videos/06-connect-a-local-model-ollama.mp4) — free, local, no key | 1:11 |
+| ▶ | [Allocate tasks to models](docs/videos/10-allocate-tasks-to-models.mp4) — route each job to the right provider | 1:39 |
+| ▶ | [Build an exam](docs/videos/15-build-an-exam-automatically.mp4) — blueprint to finished paper | 0:52 |
 
 Offline copies are attached to the [videos-v1 release](https://github.com/am7as/aiea/releases/tag/videos-v1).
 
