@@ -1,0 +1,19 @@
+\documentclass[border=8pt]{standalone}
+\usepackage[american]{circuitikz}
+\begin{document}
+\begin{circuitikz}[line width=0.9pt]
+  % left source U1 (+ on top)
+  \draw (0,0) to[V, l={$U_1=12\,\mathrm{V}$}, invert] (0,3);
+  % top series resistor R1 (was R), current i1 to the right, into node A
+  \draw (0,3) to[R, l={$R_1=9\,\Omega$}, i={$i_1$}] (3,3) coordinate(A);
+  % middle branch R2 (was R1) downward, current i2 down
+  \draw (A) to[R, l_={$R_2=4\,\Omega$}, i={$i_2$}] (3,0);
+  % top wire to the right corner
+  \draw (A) -- (6,3);
+  % right branch: R3 (was R2) then U2 (+ on bottom), current i3 down
+  \draw (6,3) to[R, l={$R_3=12\,\Omega$}, i={$i_3$}] (6,1.5)
+        to[V, l={$U_2=24\,\mathrm{V}$}, invert] (6,0);
+  % bottom rail
+  \draw (0,0) -- (6,0);
+\end{circuitikz}
+\end{document}

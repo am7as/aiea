@@ -1,0 +1,22 @@
+[workspace]
+name        = "aiea"
+version     = "0.1.0"
+description = "AI Exam Assistant — top-level dev tools"
+channels    = ["conda-forge"]
+platforms   = ["linux-64", "linux-aarch64", "osx-arm64"]
+
+[dependencies]
+python = "3.12.*"
+
+[pypi-dependencies]
+ruff = ">=0.6.0"
+
+[tasks]
+sync-clean = "./scripts/sync-to-clean.sh"
+
+up    = "./scripts/shim-ctl.sh start && docker compose -f infra/docker-compose.yml up -d --build"
+down  = "docker compose -f infra/docker-compose.yml down && ./scripts/shim-ctl.sh stop"
+logs  = "docker compose -f infra/docker-compose.yml logs -f"
+ps    = "docker compose -f infra/docker-compose.yml ps"
+reset = "docker compose -f infra/docker-compose.yml down -v && ./scripts/shim-ctl.sh stop"
+shim  = "./scripts/shim-ctl.sh"

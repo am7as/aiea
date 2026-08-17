@@ -1,0 +1,17 @@
+[workspace]
+name        = "aiea-frontend"
+version     = "0.1.0"
+description = "Next.js frontend for AIEA"
+channels    = ["conda-forge"]
+platforms   = ["linux-64", "linux-aarch64", "osx-arm64"]
+
+[dependencies]
+nodejs = "20.*"
+pnpm   = ">=9"
+
+[tasks]
+install = "pnpm install --frozen-lockfile=false"
+dev     = { cmd = "pnpm install && pnpm dev --hostname 0.0.0.0 --port 3000", description = "Hot-reload dev server bound to all interfaces" }
+build   = { cmd = "pnpm install && pnpm build" }
+start   = "pnpm start --hostname 0.0.0.0 --port 3000"
+lint    = "pnpm lint"

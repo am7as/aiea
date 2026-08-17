@@ -1,0 +1,75 @@
+[workspace]
+name        = "aiea-backend"
+version     = "0.1.0"
+description = "AIEA backend + worker — two pixi envs via features"
+channels    = ["conda-forge"]
+platforms   = ["linux-64", "linux-aarch64", "osx-arm64"]
+
+[dependencies]
+python = "3.12.*"
+
+# ─── Shared deps for both api and worker ────────────────────────────────────
+[pypi-dependencies]
+fastapi           = ">=0.115"
+uvicorn           = { version = ">=0.30", extras = ["standard"] }
+pydantic          = { version = ">=2.9", extras = ["email"] }
+pydantic-settings = ">=2.5"
+
+sqlalchemy = { version = ">=2.0", extras = ["asyncio"] }
+asyncpg    = ">=0.30"
+alembic    = ">=1.13"
+
+httpx              = ">=0.27"
+aiofiles           = ">=24.1"
+python-multipart   = ">=0.0.12"
+python-frontmatter = ">=1.1"
+json-repair        = ">=0.30"   # structural repair of malformed LLM JSON output
+
+arq         = ">=0.26"
+apscheduler = ">=3.10"
+
+structlog  = ">=24.4"
+watchfiles = ">=0.24"
+
+ruff           = ">=0.6"
+pytest         = ">=8.3"
+pytest-asyncio = ">=0.24"
+
+# ─── Worker-only conda deps (system tools) ──────────────────────────────────
+[feature.worker.dependencies]
+# tectonic — self-contained LaTeX engine; compiles generated exams to PDF.
+tectonic = ">=0.15"
+
+# ─── Worker-only deps (extractors + export renderers) ───────────────────────
+[feature.worker.pypi-dependencies]
+pdfplumber   = ">=0.11"
+pypdf        = ">=5.0"
+python-docx  = ">=1.1"
+python-pptx  = ">=1.0"
+pdf2image    = ">=1.17"
+pytesseract  = ">=0.3.13"
+weasyprint   = ">=63"
+jinja2       = ">=3.1"
+markdown     = ">=3.7"
+# figure-aware pipeline: pymupdf crops figure regions from PDF pages;
+# matplotlib + schemdraw render generated-question figures (timing diagrams,
+# circuits, plots). Worker-only — the api container never imports them.
+pymupdf      = ">=1.24"
+matplotlib   = ">=3.9"
+schemdraw    = ">=0.19"
+
+[environments]
+default = { solve-group = "shared" }
+worker  = { features = ["worker"], solve-group = "shared" }
+
+[tasks]
+dev      = "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /workspace/app"
+prod     = "uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"
+test     = "pytest -q"
+lint     = "ruff check ."
+fmt      = "ruff format ."
+migrate  = "alembic upgrade head"
+revision = "alembic revision --autogenerate"
+
+[feature.worker.tasks]
+worker = "arq app.workers.main.WorkerSettings"
