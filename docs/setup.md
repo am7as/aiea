@@ -103,7 +103,7 @@ To wipe Postgres too: `rm -rf data/pg/` (then re-run migrations after bring-up).
 ## Sharing the clean version
 
 ```bash
-./scripts/sync-to-clean.sh         # syncs to ../aiea-share/, commits
+./scripts/sync-to-clean.sh         # syncs to ../aiea/, commits
 ./scripts/sync-to-clean.sh --push origin  # also pushes to remote
 ```
 
