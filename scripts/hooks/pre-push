@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Blocks a push to aiea-dev while the public tree (../aiea) is behind.
+# Blocks a push to aiea-dev while the nested public tree (./aiea) is behind.
 # Drift is how the public repo went 40 days stale. Escape: SKIP_SYNC_CHECK=1 git push
 set -euo pipefail
 
 [[ "${SKIP_SYNC_CHECK:-0}" == "1" ]] && exit 0
 
 DEV_ROOT="$(git rev-parse --show-toplevel)"
-CLEAN_ROOT="${AIEA_CLEAN_ROOT:-$(cd "$DEV_ROOT/.." && pwd)/aiea}"
+CLEAN_ROOT="${AIEA_CLEAN_ROOT:-$DEV_ROOT/aiea}"
 [[ -d "$CLEAN_ROOT" ]] || exit 0
 
 PENDING=$(rsync -a --delete --exclude-from="$DEV_ROOT/.cleanignore" \
@@ -14,7 +14,7 @@ PENDING=$(rsync -a --delete --exclude-from="$DEV_ROOT/.cleanignore" \
 
 if (( PENDING > 0 )); then
   echo "✗ $PENDING path(s) differ between dev and the public tree."
-  echo "  Run: pixi run sync-clean   (then push ../aiea too)"
+  echo "  Run: pixi run sync-clean   (then push ./aiea too)"
   echo "  Skip: SKIP_SYNC_CHECK=1 git push"
   exit 1
 fi

@@ -17,7 +17,7 @@
 | AI local | LM Studio / llama.cpp / MLX over OpenAI HTTP | Same as AASAP. |
 | File ingestion | pdfplumber, python-docx, python-pptx | Cover the three main course-material formats. OCR fallback via pytesseract for scans. |
 | Exam export | weasyprint (PDF), Jinja2 LaTeX template, Markdown passthrough | Standard academic formats. |
-| Repo structure | Two repos: private `aiea/` + clean `../aiea-clean/` via rsync | Same as AASAP. |
+| Repo structure | Two repos: private `aiea-dev/` + nested clean `aiea-dev/aiea/` via rsync | Same as AASAP. |
 
 ## Rejected alternatives
 

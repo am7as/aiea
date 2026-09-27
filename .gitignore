@@ -45,3 +45,6 @@ logs/
 
 dist/
 build/
+
+# Nested clean repo (github.com/am7as/aiea) — its own git, never this one's
+/aiea/
